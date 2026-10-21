@@ -1,48 +1,36 @@
+
 # Home Assistant Sidebar Folders
 
-Prototype expérimental de module frontend pour Home Assistant : dossiers repliables, glisser-déposer et masquage d'éléments de la sidebar.
+**Version : 0.2.0**
 
-> **Statut : alpha / non testé sur toutes les versions de Home Assistant.** Le frontend de Home Assistant n'expose pas d'API publique stable pour modifier la sidebar. Ce projet agit sur le DOM interne ; une mise à jour de Home Assistant peut nécessiter une adaptation.
+Extension frontend expérimentale pour organiser la barre latérale de Home Assistant.
 
-## Fonctionnalités prévues
+## Fonctionnalités
 
-- Créer des dossiers depuis le bouton **Organiser**.
-- Cliquer sur un dossier pour le replier/déplier.
-- En mode organisation, déplacer les éléments par glisser-déposer dans un dossier.
-- Clic droit sur un élément en mode organisation pour le sortir d'un dossier ou le masquer/réafficher.
-- Réinitialiser la configuration locale.
+- Ouverture du gestionnaire par appui long sur Paramètres.
+- Création, renommage et suppression de dossiers.
+- Glisser-déposer des éléments dans les dossiers.
+- Masquage et réaffichage des éléments.
+- Dossiers repliables.
+- Enregistrement et annulation des modifications.
+- Recherche des entrées de la sidebar.
 
-## Installation manuelle pour tester
+## Installation
 
-1. Copiez `ha-sidebar-folders.js` dans `/config/www/ha-sidebar-folders.js`.
-2. Ajoutez dans `configuration.yaml` :
+1. Ajouter ce dépôt dans HACS en tant que dépôt personnalisé de catégorie Dashboard.
+2. Installer l'extension.
+3. Vérifier que le fichier JavaScript est enregistré comme ressource de type module.
+4. Si nécessaire, ajouter `/local/ha-sidebar-folders.js` aux ressources frontend.
+5. Recharger Home Assistant avec Ctrl+F5.
 
-   ```yaml
-   frontend:
-     extra_module_url:
-       - /local/ha-sidebar-folders.js
-   ```
+## Configuration et données
 
-3. Redémarrez Home Assistant.
-4. Faites un rechargement forcé du navigateur (Ctrl+F5).
+La configuration est enregistrée dans le localStorage du navigateur.
+Elle n'est pas synchronisée entre appareils.
 
-## Installation HACS
+## Compatibilité
 
-Ce dépôt est structuré comme un plugin frontend HACS. Pour une distribution publique, publiez le dépôt sur GitHub puis installez-le en tant que dépôt personnalisé **Dashboard** dans HACS. Après installation, chargez le module avec `extra_module_url` si HACS ne l'enregistre pas automatiquement comme ressource globale.
+Cette extension utilise des composants internes du frontend Home Assistant.
+Une mise à jour de Home Assistant peut nécessiter une adaptation du code.
 
-## Persistance et limites
-
-- La configuration est stockée dans `localStorage` : elle est **propre à chaque navigateur/profil** et n'est pas synchronisée entre appareils.
-- Les identifiants d'éléments reposent sur leur libellé et leur URL. Si le libellé change, l'élément peut perdre son association à un dossier.
-- Le module utilise les éléments internes du frontend HA ; l'implémentation est donc fragile par nature.
-- Avant usage quotidien, testez-le sur un profil navigateur secondaire et gardez une copie de votre configuration.
-
-## Dépannage
-
-- Si le bouton **Organiser** n'apparaît pas, vérifiez la console du navigateur et la présence de `ha-sidebar` dans le frontend de votre version de HA.
-- Pour désactiver le module, retirez `extra_module_url`, redémarrez HA et rechargez le navigateur.
-- Le bouton **Réinitialiser** efface uniquement la configuration de ce module dans le navigateur courant.
-
-## Développement
-
-Le code n'utilise aucune dépendance externe ni étape de compilation.
+Tester sur une instance de développement avant un usage quotidien.
