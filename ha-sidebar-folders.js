@@ -9,7 +9,7 @@
   const STORAGE_KEY = "ha-sidebar-folders:v1";
   const STYLE_ID = "ha-sidebar-folders-style";
   const ROOT_ID = "ha-sidebar-folders-controls";
-  const ITEM_SELECTOR = "ha-sidebar-item, a[role='listitem']";
+  const ITEM_SELECTOR = "ha-list-item-button, ha-sidebar-item, a[role='listitem']";
 
   const defaultConfig = () => ({
     folders: [
@@ -90,6 +90,7 @@
       el.getAttribute?.("aria-label"),
       el.getAttribute?.("title"),
       el.querySelector?.(".item-text")?.textContent,
+      el.querySelector?.("[slot='headline']")?.textContent,
       el.querySelector?.("[slot='label']")?.textContent,
       el.shadowRoot?.querySelector?.(".item-text")?.textContent,
       el.shadowRoot?.querySelector?.("[slot='label']")?.textContent,
@@ -397,12 +398,53 @@
     scheduleRender();
   }
 
+  let holdTimer = null;
+  let holdTriggered = false;
+  let holdTarget = null;
+
+  function attachSettingsHold(sidebar) {
+    const root = sidebar?.shadowRoot;
+    if (!root) return;
+    const settings = root.querySelector("#sidebar-config");
+    if (!settings || settings.dataset.hsfHoldBound === "1") return;
+    settings.dataset.hsfHoldBound = "1";
+
+    settings.addEventListener("pointerdown", () => {
+      holdTriggered = false;
+      holdTarget = settings;
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => {
+        holdTriggered = true;
+        config.editMode = true;
+        saveConfig();
+        scheduleRender();
+        console.info("[Sidebar Folders] mode organisation activé par appui long sur Paramètres");
+      }, 650);
+    }, true);
+
+    const cancelHold = () => clearTimeout(holdTimer);
+    settings.addEventListener("pointerup", cancelHold, true);
+    settings.addEventListener("pointerleave", cancelHold, true);
+    settings.addEventListener("pointercancel", cancelHold, true);
+    settings.addEventListener("click", event => {
+      if (holdTriggered && holdTarget === settings) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        holdTriggered = false;
+        holdTarget = null;
+      }
+    }, true);
+  }
+
   function start() {
     if (!document.body) return;
     const attempt = () => {
       const sidebar = findSidebar();
       if (sidebar && sidebar !== currentSidebar) currentSidebar = sidebar;
-      if (sidebar) render();
+      if (sidebar) {
+        attachSettingsHold(sidebar);
+        render();
+      }
     };
     attempt();
     if (observer) observer.disconnect();
